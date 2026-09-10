@@ -1,0 +1,25 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam style strictuml
+
+class CSimulation
+class CRender
+class CLoopReader
+class CRobot
+class CWallFollower
+class CRangeSensor
+
+' Ownership by the main simulation class
+CSimulation *-- CRender
+CSimulation *-- CLoopReader
+CSimulation *-- CRobot
+CSimulation *-- CWallFollower
+
+' Wall-following controller owns exactly two range sensors
+CWallFollower *-- "2" CRangeSensor
+
+' The robot knows the renderer, but does not own it
+CRobot --> CRender
+
+@enduml
