@@ -1,9 +1,21 @@
+//-----------------------------------------------------------------------------
+// CRobot.cpp
+//
+// Implements the differential-drive robot model.
+// Wheel speeds are used to update the robot pose, record its travelled path,
+// detect wall collisions and draw the robot in the simulation.
+//
+// MTRX3760 Lab 2 - A2
+//-----------------------------------------------------------------------------
+
 #include "CRobot.h"
 
 #include <cmath>
 #include <iostream>
 #include <vector>
 
+//-----------------------------------------------------------------------------
+// Creates a robot at the specified start pose and stores its first trail point.
 //-----------------------------------------------------------------------------
 CRobot::CRobot(
     CRender& arRender,
@@ -21,23 +33,28 @@ CRobot::CRobot(
     mTrail.push_back( mPose.mPosition );
 }
 
+
+//-----------------------------------------------------------------------------
+// Advances the differential-drive robot by one simulation timestep.
 //-----------------------------------------------------------------------------
 void CRobot::Update(
     float aLeftSpeed,
     float aRightSpeed,
     float aTimeStep )
 {
+    // Calculate forward motion from the average wheel speed.
     const float Distance =
         ( aLeftSpeed + aRightSpeed )
         * 0.5f
         * aTimeStep;
 
+    // Calculate rotation from the difference between the wheel speeds.
     const float HeadingChange =
         ( aLeftSpeed - aRightSpeed )
         / mWheelSeparation
         * aTimeStep;
 
-    // Half the turn.
+    // Apply half of the rotation before moving.
     mPose.mHeading +=
         HeadingChange * 0.5f;
 
@@ -50,14 +67,18 @@ void CRobot::Update(
         Distance
         * std::sin( mPose.mHeading );
 
-    // Remaining half of turn.
+    // Apply the remaining half of the rotation.
     mPose.mHeading +=
         HeadingChange * 0.5f;
 
+    // Store the new position for drawing the trail.
     mTrail.push_back(
         mPose.mPosition );
 }
 
+
+//-----------------------------------------------------------------------------
+// Checks the robot against every wall and counts new collision events.
 //-----------------------------------------------------------------------------
 void CRobot::CheckCollision(
     const CLoopReader& arLoop )
@@ -101,6 +122,9 @@ void CRobot::CheckCollision(
     mWasColliding = IsColliding;
 }
 
+
+//-----------------------------------------------------------------------------
+// Finds the shortest distance between the robot centre and a wall segment.
 //-----------------------------------------------------------------------------
 float CRobot::DistanceToSegment(
     Vec2D aPoint,
@@ -122,6 +146,7 @@ float CRobot::DistanceToSegment(
     const float LengthSquared =
         VX * VX + VY * VY;
 
+    // Find where the point projects along the wall segment.
     float T = 0.0f;
 
     if( LengthSquared > 0.0f )
@@ -131,6 +156,7 @@ float CRobot::DistanceToSegment(
             / LengthSquared;
     }
 
+    // Keep the closest point between the two wall endpoints.
     if( T < 0.0f )
     {
         T = 0.0f;
@@ -156,6 +182,9 @@ float CRobot::DistanceToSegment(
         DX * DX + DY * DY );
 }
 
+
+//-----------------------------------------------------------------------------
+// Draws the travelled path, robot body and heading indicator.
 //-----------------------------------------------------------------------------
 void CRobot::Draw() const
 {
@@ -206,12 +235,18 @@ void CRobot::Draw() const
         RAYWHITE );
 }
 
+
+//-----------------------------------------------------------------------------
+// Returns the robot's current pose.
 //-----------------------------------------------------------------------------
 const CPose& CRobot::GetPose() const
 {
     return mPose;
 }
 
+
+//-----------------------------------------------------------------------------
+// Returns the number of separate collision events.
 //-----------------------------------------------------------------------------
 int CRobot::GetCollisionCount() const
 {

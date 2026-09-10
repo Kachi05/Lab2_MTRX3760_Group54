@@ -1,8 +1,20 @@
+//-----------------------------------------------------------------------------
+// CLineSensor.cpp
+//
+// Implements the line sensor used by the line-following robot.
+// The sensor position is transformed into world coordinates and compared
+// with each segment of the floor line.
+//
+// MTRX3760 Lab 2 - A2
+//-----------------------------------------------------------------------------
+
 #include "CLineSensor.h"
 
 #include <cmath>
 #include <vector>
 
+//-----------------------------------------------------------------------------
+// Creates the sensor at a fixed position relative to the robot.
 //-----------------------------------------------------------------------------
 CLineSensor::CLineSensor(
     float aForwardOffset,
@@ -15,6 +27,8 @@ CLineSensor::CLineSensor(
 }
 
 
+//-----------------------------------------------------------------------------
+// Checks whether the sensor is positioned over any segment of the floor line.
 //-----------------------------------------------------------------------------
 bool CLineSensor::Sense(
     const CPose& arRobotPose,
@@ -54,6 +68,8 @@ bool CLineSensor::Sense(
 
     if( !Vertices.empty() )
     {
+        // Start with the last vertex so the closing segment
+        // between the last and first vertices is also checked.
         Vec2D Previous =
             Vertices.back();
 
@@ -79,6 +95,8 @@ bool CLineSensor::Sense(
 
 
 //-----------------------------------------------------------------------------
+// Finds the shortest distance from a point to a finite line segment.
+//-----------------------------------------------------------------------------
 float CLineSensor::DistanceToSegment(
     Vec2D aPoint,
     Vec2D aSegmentStart,
@@ -99,6 +117,7 @@ float CLineSensor::DistanceToSegment(
     const float LengthSquared =
         VX * VX + VY * VY;
 
+    // Find where the point projects along the line segment.
     float T = 0.0f;
 
     if( LengthSquared > 0.0f )
@@ -108,6 +127,7 @@ float CLineSensor::DistanceToSegment(
             / LengthSquared;
     }
 
+    // Keep the closest point between the two segment endpoints.
     if( T < 0.0f )
     {
         T = 0.0f;

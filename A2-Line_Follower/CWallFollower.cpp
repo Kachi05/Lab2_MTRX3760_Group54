@@ -1,7 +1,19 @@
+//-----------------------------------------------------------------------------
+// CWallFollower.cpp
+//
+// Implements the wall-following controller.
+// The right and diagonal range-sensor readings are used to calculate the
+// wheel speeds required to follow the room walls.
+//
+// MTRX3760 Lab 2 - A2
+//-----------------------------------------------------------------------------
+
 #include "CWallFollower.h"
 
 #include <cmath>
 
+//-----------------------------------------------------------------------------
+// Sets the sensor directions and wall-following control values.
 //-----------------------------------------------------------------------------
 CWallFollower::CWallFollower()
     :
@@ -22,6 +34,9 @@ CWallFollower::CWallFollower()
 {
 }
 
+
+//-----------------------------------------------------------------------------
+// Reads both range sensors and determines the wheel speeds for this update.
 //-----------------------------------------------------------------------------
 void CWallFollower::GetWheelSpeeds(
     const CPose& arRobotPose,
@@ -58,12 +73,14 @@ void CWallFollower::GetWheelSpeeds(
     // Normal wall following.
     else
     {
+        // Calculate the error from the target wall distance.
         const float Error =
             RightDistance - mTargetDistance;
 
         float Correction =
             mGain * Error;
 
+        // Limit the correction to avoid excessively large steering changes.
         if( Correction > mMaximumCorrection )
         {
             Correction = mMaximumCorrection;

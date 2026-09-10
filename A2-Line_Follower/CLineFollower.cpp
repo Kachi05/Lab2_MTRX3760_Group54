@@ -1,6 +1,17 @@
+//-----------------------------------------------------------------------------
+// CLineFollower.cpp
+//
+// Implements the line-following controller.
+// The states of two line sensors are used to select wheel speeds which keep
+// the robot following the floor line.
+//
+// MTRX3760 Lab 2 - A2
+//-----------------------------------------------------------------------------
+
 #include "CLineFollower.h"
 
-
+//-----------------------------------------------------------------------------
+// Sets the sensor positions and wheel speeds used by the line follower.
 //-----------------------------------------------------------------------------
 CLineFollower::CLineFollower()
     :
@@ -14,6 +25,8 @@ CLineFollower::CLineFollower()
 }
 
 
+//-----------------------------------------------------------------------------
+// Reads the two line sensors and chooses the required steering response.
 //-----------------------------------------------------------------------------
 void CLineFollower::GetWheelSpeeds(
     const CPose& arRobotPose,

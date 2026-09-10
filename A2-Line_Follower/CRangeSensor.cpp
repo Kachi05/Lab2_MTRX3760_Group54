@@ -1,8 +1,20 @@
+//-----------------------------------------------------------------------------
+// CRangeSensor.cpp
+//
+// Implements the range sensor used by the wall-following robot.
+// A ray is projected from the robot and tested against each wall segment to
+// determine the closest detected wall distance.
+//
+// MTRX3760 Lab 2 - A2
+//-----------------------------------------------------------------------------
+
 #include "CRangeSensor.h"
 
 #include <cmath>
 #include <vector>
 
+//-----------------------------------------------------------------------------
+// Stores the sensor's angle relative to the robot.
 //-----------------------------------------------------------------------------
 CRangeSensor::CRangeSensor( float aAngleOffset )
     :
@@ -10,11 +22,15 @@ CRangeSensor::CRangeSensor( float aAngleOffset )
 {
 }
 
+
+//-----------------------------------------------------------------------------
+// Checks every wall segment and returns the closest detected distance.
 //-----------------------------------------------------------------------------
 float CRangeSensor::Sense(
     const CPose& arRobotPose,
     const CLoopReader& arLoop ) const
 {
+    // Used when no wall is detected by the sensor.
     const float MaximumRange = 10000.0f;
 
     float ClosestDistance = MaximumRange;
@@ -26,6 +42,7 @@ float CRangeSensor::Sense(
     {
         Vec2D Previous = Vertices.back();
 
+        // Test the sensor ray against every segment of the room.
         for( const Vec2D& Vertex : Vertices )
         {
             float Distance = 0.0f;
@@ -50,6 +67,9 @@ float CRangeSensor::Sense(
     return ClosestDistance;
 }
 
+
+//-----------------------------------------------------------------------------
+// Determines whether the sensor ray intersects a finite wall segment.
 //-----------------------------------------------------------------------------
 bool CRangeSensor::RaySegmentIntersection(
     Vec2D aOrigin,
@@ -70,6 +90,7 @@ bool CRangeSensor::RaySegmentIntersection(
     const float Denominator =
         RayX * SegmentY - RayY * SegmentX;
 
+    // Parallel lines do not have a valid intersection.
     if( std::abs( Denominator ) < 0.000001f )
     {
         return false;
@@ -89,6 +110,8 @@ bool CRangeSensor::RaySegmentIntersection(
         ( QX * RayY - QY * RayX )
         / Denominator;
 
+    // The intersection must be in front of the sensor
+    // and between the two endpoints of the wall segment.
     if( T >= 0.0f && U >= 0.0f && U <= 1.0f )
     {
         arDistance = T;
