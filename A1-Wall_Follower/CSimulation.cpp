@@ -137,10 +137,3 @@ void CSimulation::PrintSummary() const
         << mpRobot->GetCollisionCount()
         << std::endl;
 }
-
-if( mUpdateCount < mMaximumUpdates )
-{
-    Update();
-}
-
-Draw();
